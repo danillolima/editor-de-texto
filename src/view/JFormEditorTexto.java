@@ -6,11 +6,13 @@
 package view;
 
 import controller.Arquivos;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -19,13 +21,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class JFormEditorTexto extends javax.swing.JFrame {
     
-    private Arquivos obj;
-
+    private ArrayList<Arquivos> obj;
+    private ArrayList<JTextArea> t;
+    private BufferedImage  bg;
+   
     /**
      * Creates new form NovoJFrame
      */
-    public JFormEditorTexto() {
-        this.obj = new Arquivos();
+    public JFormEditorTexto(){
+        this.obj = new ArrayList();
+        this.t = new ArrayList();
         initComponents();
     }
 
@@ -39,10 +44,10 @@ public class JFormEditorTexto extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextAreaArquivo = new javax.swing.JTextArea();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -50,16 +55,24 @@ public class JFormEditorTexto extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
-
-        jTextAreaArquivo.setColumns(20);
-        jTextAreaArquivo.setRows(5);
-        jScrollPane2.setViewportView(jTextAreaArquivo);
-
-        getContentPane().add(jScrollPane2);
+        getContentPane().add(jTabbedPane1);
 
         jMenu1.setMnemonic('A');
         jMenu1.setText("Arquivo");
         jMenu1.setToolTipText("");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
+
+        jMenuItem4.setText("Novo");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem4);
 
         jMenuItem1.setMnemonic('b');
         jMenuItem1.setText("Abrir");
@@ -109,7 +122,7 @@ public class JFormEditorTexto extends javax.swing.JFrame {
 
         setJMenuBar(jMenuBar1);
 
-        setSize(new java.awt.Dimension(410, 337));
+        setSize(new java.awt.Dimension(866, 638));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -118,27 +131,47 @@ public class JFormEditorTexto extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1MouseClicked
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        obj.abrirarquivo();
-        jTextAreaArquivo.setText(obj.Le());
+        if(obj.isEmpty()){
+            obj.add(new Arquivos());
+            obj.get(0).abrirarquivo();
+            t.add(new JTextArea());
+            t.get(0).setText(obj.get(0).Le());
+            JScrollPane j = new JScrollPane();
+            jTabbedPane1.addTab(obj.get(0).getArquivo().getName(), j);
+            jTabbedPane1.setTitleAt(0,obj.get(0).getArquivo().getName() );
+            j.setViewportView(t.get(0));
+        }
+        else{
+            int size = obj.size();
+            obj.add(new Arquivos());
+            obj.get(size).abrirarquivo();
+            JScrollPane j = new JScrollPane();
+            jTabbedPane1.addTab(obj.get(size).getArquivo().getName(), j);
+            t.add(new JTextArea());
+            t.get(t.size()-1).setText(obj.get(size).Le());
+            j.setViewportView(t.get(t.size()-1));
+        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        if(obj.getArquivo() == null){
+        if(obj.get(jTabbedPane1.getSelectedIndex()).getArquivo() == null){
             JFileChooser file = new JFileChooser();
             int status = file.showSaveDialog(null);
             if(status == file.APPROVE_OPTION){
                 File arquivo =  file.getSelectedFile();
-                obj.setArquivo(arquivo); 
-                obj.Escreve(jTextAreaArquivo.getText(), true);
+                obj.get(jTabbedPane1.getSelectedIndex()).setArquivo(arquivo); 
+                obj.get(jTabbedPane1.getSelectedIndex()).Escreve(t.get(jTabbedPane1.getSelectedIndex()).getText(), true);
             }
         }
         else{
-            obj.Escreve(jTextAreaArquivo.getText(), false);
+            obj.get(jTabbedPane1.getSelectedIndex()).Escreve(t.get(jTabbedPane1.getSelectedIndex()).getText(), false);
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        if(obj.getArquivo() == null){
+        
+      
+        if(obj.get(jTabbedPane1.getSelectedIndex()).getArquivo() == null){
             JFileChooser file = new JFileChooser();
             FileFilter filter;
             FileNameExtensionFilter File_ext_txt = new FileNameExtensionFilter("Text Documents(*.txt)", "txt");
@@ -146,23 +179,37 @@ public class JFormEditorTexto extends javax.swing.JFrame {
             int status = file.showSaveDialog(null);
             if(status == file.APPROVE_OPTION){
                 File arquivo =  file.getSelectedFile();
-                obj.setArquivo(arquivo); 
-                obj.Escreve(jTextAreaArquivo.getText(), true);
+                obj.get(jTabbedPane1.getSelectedIndex()).setArquivo(arquivo); 
+                obj.get(jTabbedPane1.getSelectedIndex()).Escreve(t.get(jTabbedPane1.getSelectedIndex()).getText(), true);
             }
         }
         else{
-            obj.Escreve(jTextAreaArquivo.getText(), false);
+            obj.get(jTabbedPane1.getSelectedIndex()).Escreve(t.get(jTabbedPane1.getSelectedIndex()).getText(), false);
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenu4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu4ActionPerformed
-        
-    // TODO add your handling code here:
+   
     }//GEN-LAST:event_jMenu4ActionPerformed
 
     private void jMenu4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MouseClicked
         dispose();
     }//GEN-LAST:event_jMenu4MouseClicked
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        obj.add(new Arquivos());
+        int indice = obj.size(), indc;
+        JScrollPane j = new JScrollPane();
+        jTabbedPane1.addTab("Novo arquivo " + (jTabbedPane1.getTabCount()+1) , j);
+        indc = t.size();
+        t.add(new JTextArea());
+        t.get(indc).setText("");
+        j.setViewportView(t.get(indc));
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -210,7 +257,7 @@ public class JFormEditorTexto extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextAreaArquivo;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 }

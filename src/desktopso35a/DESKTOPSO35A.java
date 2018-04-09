@@ -18,8 +18,11 @@ public class DESKTOPSO35A {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        JFormEditorTexto principal = new JFormEditorTexto();
-        principal.setVisible(true);
+        
+            JFormEditorTexto principal = new JFormEditorTexto();
+            principal.setVisible(true);
+        
+        
     }
     
 }
